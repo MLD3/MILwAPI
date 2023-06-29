@@ -1,0 +1,34 @@
+
+\begin{table}[b]
+\caption{Classification Time of All Methods with and without positional encodings (PE) on Synthetic Datasets}
+\begin{center}
+\begin{tabular}{|p{0.14\textwidth}|p{0.11\textwidth}|p{0.16\textwidth}|}\hline
+ \textbf{Base Model}& \textbf{Use of PE} & \textbf{Classification Time (s)}\\
+\hline
+ABDMIL & No PE  & 0.242 \\
+ & PE  & 0.258   \\
+\hline
+ CLAM-SB & No PE  & 0.344   \\
+ & PE  & 0.366   \\
+\hline
+CLAM-MB & No PE & 0.388  \\
+ & PE  & 0.405  \\
+\hline
+ DTFD & No PE  & 0.687    \\
+ & PE  & 0.697   \\
+\hline
+TransMIL & No PE  & 1.228  \\
+ & PE  & 1.289  \\
+\hline
+Transformer with & No PE  &  0.459 \\
+Original Attention & PE  &  0.475 \\
+\hline
+
+\end{tabular}
+\label{tab:speed}
+\end{center}
+\end{table}
+
+
+Real Task: Feature Extractor Classification Time 22976.349
+
