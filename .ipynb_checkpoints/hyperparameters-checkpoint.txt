@@ -1,0 +1,84 @@
+Hyperparameters for All Methods
+Synthetic Data Feature Extractor: Both convolutional layers have a kernel size of 5. The first convolutional layer has 40 output channels. The second convolutional layer has 100 output channels. The final linear layer has 500 output features
+
+\begin{itemize}
+\item ABDMIL
+\begin{itemize}
+    \item Synthetic Data
+    \begin{itemize}
+    \item fixed hyperparameters: hidden layer size of 128
+    \item hyperparameters searched over: learning rates of [$1e-4$, $1e-5$] and the weight decays of [$1e-6$, $1e-7$]
+    \item without positional encoding, final hyperparameters:  hidden layer size of 128, a learning rate of $1e-4$, and a weight decay of $1e-7$
+    \item with positional encoding, final hyperparameters: hidden layer size of 128, a learning rate of $1e-4$, and a weight decay of $1e-7$.
+    \end{itemize}
+    \item Real Data
+    \begin{itemize}
+    \item hyperparameters searched over:  hidden layer sizes of [128, 512, 1024, 2048, 4096]; learning rates of [$1e-4$, $1e-5$], and weight decays of [$1e-6$, $1e-7$].
+    \item without positional encoding, final hyperparameters: a hidden layer size of 2048, a learning rate of $1e-4$, and a weight decay of $1e-6$
+    \item with positional encoding, final hyperparameters: a hidden layer size of 4096, a learning rate of $1e-4$, and a weight decay of $1e-7$.
+    \end{itemize}
+\end{itemize}
+\item CLAM-SB
+\begin{itemize}
+    \item Synthetic Data
+    \begin{itemize}
+    \item hyperparameters searched over: learning rates of [$1e-4$, $1e-5$], weight decays of [$1e-6$, $1e-7$], and CLAM-specific parameters B of [1, 2, 5], dropout of [True, False] and $c_1$ of [0.3, 0.5, 0.7]
+    \item without positional encoding, final hyperparameters: a learning rate of $1e-4$, a weight decay of $1e-7$, and CLAM-specific parameters B of 5, no dropout, and $c_1$ of 0.7
+    \item with positional encoding, final hyperparameters: a learning rate of $1e-4$, a weight decay of $1e-7$, and CLAM-specific parameters B of 5, dropout, and $c_1$ of 0.5 
+    \end{itemize}
+    \item Real Data
+    \begin{itemize}
+    \item hyperparameters searched over:  learning rates of [$1e-4$, $1e-5$], weight decays of [$1e-6$, $1e-7$], and CLAM-specific parameters B of [2, 4, 6, 8, 12], dropout of [True, False] and $c_1$ of [0.3, 0.5, 0.7]
+    \item without positional encoding, final hyperparameters: a learning rate of $1e-5$, a weight decay of $1e-7$, and CLAM-specific parameters B of 6, no dropout, and $c_1$ of 0.5
+    \item with positional encoding, final hyperparameters: a learning rate of $1e-5$, a weight decay of $1e-7$, and CLAM-specific parameters B of 6, no dropout, and $c_1$ of 0.7
+    \end{itemize}
+\end{itemize}
+\item CLAM-MB
+\begin{itemize}
+    \item Synthetic Data
+    \begin{itemize}
+    \item hyperparameters searched over: learning rates of [$1e-4$, $1e-5$], weight decays of [$1e-6$, $1e-7$], and CLAM-specific parameters B of [1, 2, 5], dropout of [True, False] and $c_1$ of [0.3, 0.5, 0.7]
+    \item without positional encoding, final hyperparameters: a learning rate of $1e-4$, a weight decay of $1e-7$, and CLAM-specific parameters B of 1, dropout, and $c_1$ of 0.5
+    \item with positional encoding, final hyperparameters: a learning rate of $1e-4$, a weight decay of $1e-6$, and CLAM-specific parameters B of 5, dropout, and $c_1$ of 0.3 
+    \end{itemize}
+    \item Real Data
+    \begin{itemize}
+    \item hyperparameters searched over:  learning rates of [$1e-4$, $1e-5$], weight decays of [$1e-6$, $1e-7$], and CLAM-specific parameters B of [2, 4, 6, 8, 12], dropout of [True, False] and $c_1$ of [0.3, 0.5, 0.7]
+    \item without positional encoding, final hyperparameters:  learning rate of $1e-5$, a weight decay of $1e-7$, and CLAM-specific parameters B of 8, no dropout, and $c_1$ of 0.7
+    \item with positional encoding, final hyperparameters: a learning rate of $1e-5$, a weight decay of $1e-6$, and CLAM-specific parameters B of 4, no dropout, and $c_1$ of 07 
+    \end{itemize}
+\end{itemize}
+\item DTFD
+\begin{itemize}
+    \item Synthetic Data
+    \begin{itemize}
+    \item fixed hyperparameters: hidden layer size of 128
+    \item hyperparameters searched over: learning rates of [$1e-4$, $1e-5$] the weight decays of [$1e-6$, $1e-7$], and the number of pseudo bags of [2, 5]
+    \item without positional encoding, final hyperparameters: a hidden layer size of 128, a learning rate of $1e-4$, a weight decay of $1e-6$, and 5 pseudo bags
+    \item with positional encoding, final hyperparameters: a hidden layer size of 128, a learning rate of $1e-4$, a weight decay of $1e-6$, and 5 pseudo bags 
+    \end{itemize}
+    \item Real Data
+    \begin{itemize}
+    \item hyperparameters searched over:  hidden layer sizes of [128, 512, 1024, 2048, 4096]; learning rates of [$1e-4$, $1e-5$],  weight decays of [$1e-6$, $1e-7$], and the number of pseudo bags of [2, 4, 6, 12, 24]
+    \item without positional encoding, final hyperparameters: a hidden layer size of 128, a learning rate of $1e-4$, a weight decay of $1e-6$, and 4 pseudo bags
+    \item with positional encoding, final hyperparameters: a hidden layer size of 1024, a learning rate of $1e-5$, a weight decay of $1e-6$, and 24 pseudo bags 
+    \end{itemize}
+\end{itemize}
+\item TransMIL + Other Transformers
+\begin{itemize}
+    \item Synthetic Data
+    \begin{itemize}
+    \item fixed hyperparameter: non-TransMIL transformer used Multihead Attention with 8 attention heads
+    \item hyperparameters searched over: hidden layer sizes of [32, 64, 128]; learning rates of [$1e-4$, $1e-5$] and weight decays of [$1e-6$, $1e-7$]
+    \item without positional encoding, final hyperparameters: a hidden layer size of 64, a learning rate of $1e-4$, and a weight decay of $1e-6$
+    \item with positional encoding, final hyperparameters: a hidden layer size of 32, a learning rate of $1e-4$, and a weight decay of $1e-6$ 
+    \end{itemize}
+    \item Real Data
+    \begin{itemize}
+    \item fixed hyperparameter: non-TransMIL transformer used Multihead Attention with 8 attention heads
+    \item hyperparameters searched over:  hidden layer sizes of [128, 512, 1024]; learning rates of [$1e-4$, $1e-5$], and weight decays of [$1e-6$, $1e-7$].
+    \item without positional encoding, final hyperparameters: a hidden layer size of 128, a learning rate of $1e-5$, and a weight decay of $1e-7$
+    \item with positional encoding, final hyperparameters: a hidden layer size of 128, a learning rate of $1e-5$, and a weight decay of $1e-7$  
+    \end{itemize}
+\end{itemize}
+\end{itemize}
