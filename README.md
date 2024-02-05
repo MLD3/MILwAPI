@@ -1,4 +1,4 @@
-Additional Information for SDM24 Submission: Multiple Instance Learning with Absolute Position Information
+Additional Information for CHIL Submission: Multiple Instance Learning with Absolute Position Information
 
 File Definitions
 - pretrain_chexpert.txt: names of the images we used to pretrain models that evaluate our real data task
