@@ -142,7 +142,7 @@ for epoch in range(100):
 
 
 
-    torch.save(model.state_dict(), '/data2/meerak/models/best_clamMB_nope_mimiccxr_densenet_epoch%d'%(epoch))
+    torch.save(model.state_dict(), '/data2/user/models/best_clamMB_nope_mimiccxr_densenet_epoch%d'%(epoch))
 
     if val_aurocs[-1] < max_acc:
         stop_idx += 1

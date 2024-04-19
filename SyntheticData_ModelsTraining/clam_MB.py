@@ -15,17 +15,17 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 sparsity = 1/10
 bag_size = 10
 for num_bags in [100, 1000, 10000]:
-    X_train = joblib.load('/home/meerak/MNIST/X_train_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
-    y_train = joblib.load('/home/meerak/MNIST/y_train_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
-    actual_y_train = joblib.load('/home/meerak/MNIST/actual_y_train_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
+    X_train = joblib.load('/home/user/MNIST/X_train_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
+    y_train = joblib.load('/home/user/MNIST/y_train_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
+    actual_y_train = joblib.load('/home/user/MNIST/actual_y_train_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
 
-    X_val = joblib.load('/home/meerak/MNIST/X_val_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
-    y_val = joblib.load('/home/meerak/MNIST/y_val_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
-    actual_y_val = joblib.load('/home/meerak/MNIST/actual_y_val_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
+    X_val = joblib.load('/home/user/MNIST/X_val_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
+    y_val = joblib.load('/home/user/MNIST/y_val_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
+    actual_y_val = joblib.load('/home/user/MNIST/actual_y_val_%d_%d_%d'%((int(sparsity*100), bag_size, num_bags)))
 
-    X_test = joblib.load('/home/meerak/MNIST/X_test_%d_%d_%d'%((int(sparsity*100), bag_size, 250)))
-    y_test = joblib.load('/home/meerak/MNIST/y_test_%d_%d_%d'%((int(sparsity*100), bag_size, 250)))
-    actual_y_test = joblib.load('/home/meerak/MNIST/actual_y_test_%d_%d_%d'%((int(sparsity*100), bag_size, 250)))
+    X_test = joblib.load('/home/user/MNIST/X_test_%d_%d_%d'%((int(sparsity*100), bag_size, 250)))
+    y_test = joblib.load('/home/user/MNIST/y_test_%d_%d_%d'%((int(sparsity*100), bag_size, 250)))
+    actual_y_test = joblib.load('/home/user/MNIST/actual_y_test_%d_%d_%d'%((int(sparsity*100), bag_size, 250)))
 
     dg = CIFAR10Dataset('train', {'features':torch.tensor(X_train), 'labels':torch.tensor(y_train), 'labels2':torch.tensor(actual_y_train)})
     val_dg = CIFAR10Dataset('val', {'features':torch.tensor(X_val), 'labels':torch.tensor(y_val), 'labels2':torch.tensor(actual_y_val)})
@@ -36,9 +36,9 @@ for num_bags in [100, 1000, 10000]:
     test_loader = DataLoader(test_dg,batch_size = 1,shuffle = False)
 
     for perm_dist in range(0, 11):
-        train_shuffle_idxs = joblib.load('/home/meerak/MNIST/train_idxs_numbags_%d_permdist_%d.joblib'%(num_bags, perm_dist))
-        val_shuffle_idxs = joblib.load('/home/meerak/MNIST/val_idxs_numbags_%d_permdist_%d.joblib'%(num_bags, perm_dist))
-        test_shuffle_idxs = joblib.load('/home/meerak/MNIST/test_idxs_permdist_%d.joblib'%perm_dist)
+        train_shuffle_idxs = joblib.load('/home/user/MNIST/train_idxs_numbags_%d_permdist_%d.joblib'%(num_bags, perm_dist))
+        val_shuffle_idxs = joblib.load('/home/user/MNIST/val_idxs_numbags_%d_permdist_%d.joblib'%(num_bags, perm_dist))
+        test_shuffle_idxs = joblib.load('/home/user/MNIST/test_idxs_permdist_%d.joblib'%perm_dist)
 
         cM = 40
         cE = 100
@@ -183,7 +183,7 @@ for num_bags in [100, 1000, 10000]:
                 if stop_idx >= 5 and epoch > 10:
                     break
 
-                with open('/data2/meerak/txtfiles/seed%d_numbags%d_MNIST_permdist%d_ClamMB_loss.txt'%(seed, num_bags, perm_dist), 'w') as f:
+                with open('/data2/user/txtfiles/seed%d_numbags%d_MNIST_permdist%d_ClamMB_loss.txt'%(seed, num_bags, perm_dist), 'w') as f:
                     count = -1
                     f.write('epoch, train loss, val loss, val auroc, test aurocs\n')
                     for tl, vl, va, testa in zip(train_losses, val_losses, val_aurocs, test_aurocs):

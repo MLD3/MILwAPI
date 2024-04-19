@@ -13,9 +13,9 @@ os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="7"
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-X_train, y_train = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_train_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_train_ys.joblib'))
-X_val, y_val = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_val_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_val_ys.joblib'))
-X_test, y_test = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_test_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_test_ys.joblib'))
+X_train, y_train = np.array(joblib.load('/data2/user/MIMIC_CXR_FTS/UPDATED_train_fts.joblib')), np.array(joblib.load('/data2/user/MIMIC_CXR_FTS/UPDATED_train_ys.joblib'))
+X_val, y_val = np.array(joblib.load('/data2/user/MIMIC_CXR_FTS/UPDATED_val_fts.joblib')), np.array(joblib.load('/data2/user/MIMIC_CXR_FTS/UPDATED_val_ys.joblib'))
+X_test, y_test = np.array(joblib.load('/data2/user/MIMIC_CXR_FTS/UPDATED_test_fts.joblib')), np.array(joblib.load('/data2/user/MIMIC_CXR_FTS/UPDATED_test_ys.joblib'))
 
 print(X_train.shape, y_train.shape, X_val.shape, y_val.shape)
     
@@ -136,7 +136,7 @@ for epoch in range(100):
     test_losses.append(sum(losses)/len(losses))
     test_aurocs.append(roc_auc_score(bag_ys, bag_preds))
 
-    torch.save(model.state_dict(), '/data2/meerak/models/best_dtfd_pe_mimiccxr_densenet_epoch%d'%(epoch))
+    torch.save(model.state_dict(), '/data2/user/models/best_dtfd_pe_mimiccxr_densenet_epoch%d'%(epoch))
 
     if val_aurocs[-1] < max_acc:
         stop_idx += 1

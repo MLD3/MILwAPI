@@ -136,7 +136,7 @@ for epoch in range(100):
     test_losses.append(sum(losses)/len(losses))
     test_aurocs.append(roc_auc_score(bag_ys, bag_preds))
 
-    torch.save(model.state_dict(), '/data2/meerak/models/best_dtfd_nope_mimiccxr_densenet_epoch%d'%(epoch))
+    torch.save(model.state_dict(), '/data2/user/models/best_dtfd_nope_mimiccxr_densenet_epoch%d'%(epoch))
 
     if val_aurocs[-1] < max_acc:
         stop_idx += 1

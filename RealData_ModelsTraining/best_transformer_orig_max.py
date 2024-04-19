@@ -164,7 +164,7 @@ for dict_attn in ['_orig']:
 
 
 
-                    torch.save(model.state_dict(), '/data2/meerak/models/best_transformer%s%s%s_mimiccxr_densenet_epoch%d'%(dict_attn, dict_agg, dict_addPE, epoch))
+                    torch.save(model.state_dict(), '/data2/user/models/best_transformer%s%s%s_mimiccxr_densenet_epoch%d'%(dict_attn, dict_agg, dict_addPE, epoch))
 
                     if val_aurocs[-1] <= max_acc:
                         stop_idx += 1
