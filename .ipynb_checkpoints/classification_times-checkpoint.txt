@@ -5,28 +5,24 @@
 \begin{tabular}{|p{0.14\textwidth}|p{0.11\textwidth}|p{0.16\textwidth}|}\hline
  \textbf{Base Model}& \textbf{Use of PE} & \textbf{Classification Time (s)}\\
 \hline
-ABDMIL & No PE  & 0.242 \\
- & PE  & 0.258   \\
+ABDMIL & No PE  & 0.639 \\
+ & PE  & 0.582   \\
 \hline
- CLAM-SB & No PE  & 0.344   \\
- & PE  & 0.366   \\
+ CLAM-SB & No PE  & 1.123   \\
+ & PE  & 0.665   \\
 \hline
-CLAM-MB & No PE & 0.388  \\
- & PE  & 0.405  \\
+CLAM-MB & No PE & 1.265  \\
+ & PE  & 0.923 \\
 \hline
- DTFD & No PE  & 0.687    \\
- & PE  & 0.697   \\
+ DTFD & No PE  & 1.339    \\
+ & PE  & 1.759   \\
  \hline
  SG-MIL & No PE  & 1.116   \\
  & PE  & 1.498  \\
 \hline
-TransMIL & No PE  & 1.228  \\
- & PE  & 1.289  \\
+TransMIL & PE  & 3.528  \\
 \hline
 DASMIL & PE & 2.75 \\
-\hline
-Transformer with & No PE  &  0.459 \\
-Original Attention & PE  &  0.475 \\
 \hline
 
 \end{tabular}
