@@ -1,4 +1,4 @@
-Additional Information for CHIL Submission: Multiple Instance Learning with Absolute Position Information
+Code and Additional Information for "Multiple Instance Learning with Absolute Position Information"
 
 File Definitions
 
