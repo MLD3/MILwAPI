@@ -24,7 +24,7 @@ def initialize_weights(module):
             
 class Attn_Net(nn.Module):
 
-    def __init__(self, L = 500, D = 256, dropout = False, n_classes = 1):
+    def __init__(self, L = 1000, D = 256, dropout = False, n_classes = 1):
         super(Attn_Net, self).__init__()
         self.module = [
             nn.Linear(L, D),
@@ -49,7 +49,7 @@ args:
     n_classes: number of classes 
 """
 class Attn_Net_Gated(nn.Module):
-    def __init__(self, L = 500, D = 256, dropout = False, n_classes = 1):
+    def __init__(self, L = 1000, D = 256, dropout = False, n_classes = 1):
         super(Attn_Net_Gated, self).__init__()
         self.attention_a = [
             nn.Linear(L, D),
@@ -89,9 +89,9 @@ class CLAM_SB(nn.Module):
         instance_loss_fn=nn.CrossEntropyLoss(), subtyping=False, PE = False):
         super(CLAM_SB, self).__init__()
         if PE == False:
-            self.size_dict = {"small": [500, 512, 256], "big": [500, 512, 384]}
-        else:
             self.size_dict = {"small": [1000, 512, 256], "big": [1000, 512, 384]}
+        else:
+            self.size_dict = {"small": [2000, 512, 256], "big": [2000, 512, 384]}
         size = self.size_dict[size_arg]
         fc = [nn.Linear(size[0], size[1]), nn.ReLU()]
         if dropout:
@@ -202,9 +202,9 @@ class CLAM_MB(CLAM_SB):
         instance_loss_fn=nn.CrossEntropyLoss(), subtyping=False, PE = False):
         nn.Module.__init__(self)
         if PE == False:
-            self.size_dict = {"small": [500, 512, 256], "big": [500, 512, 384]}
-        else:
             self.size_dict = {"small": [1000, 512, 256], "big": [1000, 512, 384]}
+        else:
+            self.size_dict = {"small": [2000, 512, 256], "big": [2000, 512, 384]}
         size = self.size_dict[size_arg]
         fc = [nn.Linear(size[0], size[1]), nn.ReLU()]
         if dropout:

@@ -38,9 +38,9 @@ cD = 128
 cLR = 1e-5
 cWD = 1e-7
 
-for dict_attn in ['_orig']:
-        for dict_agg in [ '']:
-            for dict_addPE in ['', '_pe']:
+for dict_attn in ['']:
+        for dict_agg in ['_avg']:
+            for dict_addPE in ['_pe']:
                 
                 if dict_agg == '_max':
                     agg = 'max'

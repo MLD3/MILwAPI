@@ -11,7 +11,7 @@ import joblib
 
 torch.backends.cudnn.deterministic = True
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="5"
+os.environ["CUDA_VISIBLE_DEVICES"]="3"
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 X_train, y_train = np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_train_fts.joblib')), np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_train_ys.joblib'))
@@ -39,7 +39,7 @@ cLR = 1e-5
 cWD = 1e-7
 
 for dict_attn in ['_orig']:
-        for dict_agg in [ '']:
+        for dict_agg in ['_max']:
             for dict_addPE in ['', '_pe']:
                 
                 if dict_agg == '_max':

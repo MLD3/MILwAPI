@@ -4,8 +4,56 @@ import torch.nn.functional as F
 import torchvision.models as models
 from nystrom_attention import NystromAttention
 import numpy as np
+from timm.models.helpers import load_pretrained
+from timm.models.registry import register_model
+from timm.models.layers import trunc_normal_
 import numpy as np
+from token_transformer import Token_transformer
+from token_performer import Token_performer
+from transformer_block import Block, get_sinusoid_encoding
 from clam_models import *
+
+
+    
+    
+class SGL_Model(nn.Module):
+    def __init__(self, cD, PE = False):
+        super(SGL_Model, self).__init__()
+        
+        self.PE = PE
+        
+        self.L = 1000
+        
+        self.H3 = torch.zeros((24, self.L))
+        d = self.H3.shape[1]
+        for i in range(self.H3.shape[0]):
+            for j in range(self.H3.shape[1]//2):
+                weight = (1/1000)**((2*j)/d)
+                self.H3[i, 2*j] = torch.sin(torch.tensor(weight*i))
+                self.H3[i, 2*j + 1] = torch.cos(torch.tensor(weight*i))
+
+        
+        if PE == True:
+            self.L = self.L * 2
+            
+        self.D = cD
+        self.K = 1
+
+
+        self.classifier = nn.Sequential(
+            nn.Linear(self.L, self.L),
+            nn.ReLU(),
+            nn.Linear(self.L, 1)
+        )
+
+    def forward(self, H):
+        if self.PE == True:
+            H = torch.cat((H, self.H3.to(H.device)), 1)
+
+        Y_prob = self.classifier(H)
+
+        return Y_prob
+    
     
 class ABDMIL(nn.Module):
     def __init__(self, cD, PE = False):
@@ -19,7 +67,7 @@ class ABDMIL(nn.Module):
         d = self.H3.shape[1]
         for i in range(self.H3.shape[0]):
             for j in range(self.H3.shape[1]//2):
-                weight = (1/10000)**((2*j)/d)
+                weight = (1/1000)**((2*j)/d)
                 self.H3[i, 2*j] = torch.sin(torch.tensor(weight*i))
                 self.H3[i, 2*j + 1] = torch.cos(torch.tensor(weight*i))
 
@@ -112,6 +160,50 @@ class TransLayer(nn.Module):
             x = y
             
         return x, attn
+    
+class TransMIL_LinearPE_End(nn.Module):
+    def __init__(self, n_classes, dim, outerdim):
+        super(TransMIL_LinearPE_End, self).__init__()
+        self._fc1 = nn.Sequential(nn.Linear(outerdim, dim), nn.ReLU())
+        self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
+        self.n_classes = n_classes
+        self.layer1 = TransLayer(attn = 'Nystrom', dim = dim)
+        self.layer2 = TransLayer(attn = 'Nystrom', dim = dim)
+        self.norm = nn.LayerNorm(dim)
+        self._fc2 = nn.Linear(dim, self.n_classes)
+
+
+    def forward(self, **kwargs):
+        h = kwargs['data'].float() #[B, n, 1024]
+
+        h = self._fc1(h) #[B, n, 512]
+        orig_h = h.shape[1]
+
+        #---->pad
+        H = h.shape[1]
+        _H, _W = int(np.ceil(np.sqrt(H))), int(np.ceil(np.sqrt(H)))
+        add_length = _H * _W - H
+        h = torch.cat([h, h[:,:add_length,:]],dim = 1) #[B, N, 512]
+
+        #---->cls_token
+        B = h.shape[0]
+        cls_tokens = self.cls_token.expand(B, -1, -1).cuda()
+        h = torch.cat((cls_tokens, h), dim=1)
+
+        #---->Translayer x1
+        h, first_attns = self.layer1(h) #[B, N, 512]
+
+        #---->Translayer x2
+        h, second_attns = self.layer2(h) #[B, N, 512]
+
+        #---->cls_token
+        h = self.norm(h)[:,0]
+
+        #---->predict
+        logits = self._fc2(h) #[B, n_classes]
+        Y_hat = torch.argmax(logits, dim=1)
+        Y_prob = F.softmax(logits, dim = 1)
+        return logits
 
 
 class TransMIL_End(nn.Module):
@@ -218,7 +310,7 @@ class TransMIL(nn.Module):
         d = self.H3.shape[1]
         for i in range(self.H3.shape[0]):
             for j in range(self.H3.shape[1]//2):
-                weight = (1/10000)**((2*j)/d)
+                weight = (1/1000)**((2*j)/d)
                 self.H3[i, 2*j] = torch.sin(torch.tensor(weight*i))
                 self.H3[i, 2*j + 1] = torch.cos(torch.tensor(weight*i))
 
@@ -240,8 +332,110 @@ class TransMIL(nn.Module):
         Y_prob = self.transmil_classifier(data = H.unsqueeze(0))
 
         return Y_prob
+    
+    
+    
+class TransMIL_LinearPE(nn.Module):
+    def __init__(self, cD, PE = True):
+        super(TransMIL_LinearPE, self).__init__()
+
+        self.PE = PE
+        
+        self.L = 1000
+        
+        self.H3 = torch.zeros((24, self.L))
+        d = self.H3.shape[1]
+        for i in range(self.H3.shape[0]):
+            for j in range(self.H3.shape[1]//2):
+                weight = (1/1000)**((2*j)/d)
+                self.H3[i, 2*j] = torch.sin(torch.tensor(weight*i))
+                self.H3[i, 2*j + 1] = torch.cos(torch.tensor(weight*i))
+
+        
+        if PE == True:
+            self.L = self.L * 2
+            
+        self.D = cD
+        self.K = 1
+
+
+        self.transmil_classifier = TransMIL_LinearPE_End(n_classes=2, dim = self.D, outerdim = self.L)
+
+
+    def forward(self, H):
+        if self.PE == True:
+            H = torch.cat((H, self.H3.to(H.device)), 1)
+
+        Y_prob = self.transmil_classifier(data = H.unsqueeze(0))
+
+        return Y_prob
 
     
+class SETMIL(nn.Module):
+    def __init__(self, img_size=512, tokens_type='performer', num_classes=2, depth=12,
+                 num_heads=12, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop_rate=0., attn_drop_rate=0.,
+                 drop_path_rate=0., norm_layer=nn.LayerNorm):
+        super().__init__()
+        
+        self.num_classes = num_classes
+
+        num_patches = 24
+        decoder_embed_dim = 1000
+
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, decoder_embed_dim))
+        self.pos_embed = nn.Parameter(data=get_sinusoid_encoding(n_position=num_patches + 1, d_hid=decoder_embed_dim), requires_grad=False)
+        self.pos_drop = nn.Dropout(p=drop_rate)
+
+        dpr = [x.item() for x in torch.linspace(0, drop_path_rate, depth)]  # stochastic depth decay rule
+        self.blocks = nn.ModuleList([
+            Block(dim=decoder_embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, qk_scale=qk_scale,
+                drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer) for i in range(depth)])
+        self.norm = norm_layer(decoder_embed_dim)
+
+        # Classifier head
+        self.head = nn.Linear(decoder_embed_dim, num_classes) if num_classes > 0 else nn.Identity()
+
+        trunc_normal_(self.cls_token, std=.02)
+        self.apply(self._init_weights)
+
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            trunc_normal_(m.weight, std=.02)
+            if isinstance(m, nn.Linear) and m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+        elif isinstance(m, nn.LayerNorm):
+            nn.init.constant_(m.bias, 0)
+            nn.init.constant_(m.weight, 1.0)
+        elif isinstance(m, nn.Conv1d):
+            trunc_normal_(m.weight, std=.02)
+            if m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+
+    @torch.jit.ignore
+    def no_weight_decay(self):
+        return {'cls_token'}
+
+    def forward_features(self, x):
+        cls_tokens = self.cls_token.expand(1, -1, -1)
+        x = torch.cat((cls_tokens, x.unsqueeze(0)), dim=1)
+        # print(x.shape)
+        # print(self.pos_embed.shape)
+        x = x + self.pos_embed # remove for ablation study
+        # print(x.shape)
+        x = self.pos_drop(x)
+        for blk in self.blocks:
+            x = blk(x)
+            # print(x.shape)
+        x = self.norm(x)
+        return x[:, 0]
+
+    def forward(self, x):
+        x = self.forward_features(x)
+        # print(x.shape)
+        x = self.head(x)
+        # print(x.shape)
+        return x
+
     
 class Transformer(nn.Module):
     def __init__(self, cD, agg, attn, add = True, PE = False):
@@ -255,7 +449,7 @@ class Transformer(nn.Module):
         d = self.H3.shape[1]
         for i in range(self.H3.shape[0]):
             for j in range(self.H3.shape[1]//2):
-                weight = (1/10000)**((2*j)/d)
+                weight = (1/1000)**((2*j)/d)
                 self.H3[i, 2*j] = torch.sin(torch.tensor(weight*i))
                 self.H3[i, 2*j + 1] = torch.cos(torch.tensor(weight*i))
 
@@ -375,7 +569,7 @@ class DTFD(nn.Module):
         d = self.H3.shape[1]
         for i in range(self.H3.shape[0]):
             for j in range(self.H3.shape[1]//2):
-                weight = (1/10000)**((2*j)/d)
+                weight = (1/1000)**((2*j)/d)
                 self.H3[i, 2*j] = torch.sin(torch.tensor(weight*i))
                 self.H3[i, 2*j + 1] = torch.cos(torch.tensor(weight*i))
 
@@ -425,7 +619,7 @@ class ClamWrapper(nn.Module):
         d = self.H3.shape[1]
         for i in range(self.H3.shape[0]):
             for j in range(self.H3.shape[1]//2):
-                weight = (1/10000)**((2*j)/d)
+                weight = (1/1000)**((2*j)/d)
                 self.H3[i, 2*j] = torch.sin(torch.tensor(weight*i))
                 self.H3[i, 2*j + 1] = torch.cos(torch.tensor(weight*i))
                 

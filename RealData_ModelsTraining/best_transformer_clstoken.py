@@ -14,9 +14,9 @@ os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="6"
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-X_train, y_train = np.array(joblib.load('FeatureExtraction/UPDATED_train_fts.joblib')), np.array(joblib.load('FeatureExtraction/UPDATED_train_ys.joblib'))
-X_val, y_val = np.array(joblib.load('FeatureExtraction/UPDATED_val_fts.joblib')), np.array(joblib.load('FeatureExtraction/UPDATED_val_ys.joblib'))
-X_test, y_test = np.array(joblib.load('FeatureExtraction/UPDATED_test_fts.joblib')), np.array(joblib.load('FeatureExtraction/UPDATED_test_ys.joblib'))
+X_train, y_train = np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_train_fts.joblib')), np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_train_ys.joblib'))
+X_val, y_val = np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_val_fts.joblib')), np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_val_ys.joblib'))
+X_test, y_test = np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_test_fts.joblib')), np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_test_ys.joblib'))
 
 print(X_train.shape, y_train.shape, X_val.shape, y_val.shape)
     
@@ -164,7 +164,7 @@ for dict_attn in ['']:
 
 
 
-                    torch.save(model.state_dict(), '../modelsbest_transformer%s%s%s_mimiccxr_densenet_epoch%d'%(dict_attn, dict_agg, dict_addPE, epoch))
+                    torch.save(model.state_dict(), '/data2/meerak/models/best_transformer%s%s%s_mimiccxr_densenet_epoch%d'%(dict_attn, dict_agg, dict_addPE, epoch))
 
                     if val_aurocs[-1] <= max_acc:
                         stop_idx += 1

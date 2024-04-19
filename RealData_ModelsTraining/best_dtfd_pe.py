@@ -10,12 +10,12 @@ import joblib
 
 torch.backends.cudnn.deterministic = True
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="6"
+os.environ["CUDA_VISIBLE_DEVICES"]="7"
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-X_train, y_train = np.array(joblib.load('FeatureExtraction/UPDATED_train_fts.joblib')), np.array(joblib.load('FeatureExtraction/UPDATED_train_ys.joblib'))
-X_val, y_val = np.array(joblib.load('FeatureExtraction/UPDATED_val_fts.joblib')), np.array(joblib.load('FeatureExtraction/UPDATED_val_ys.joblib'))
-X_test, y_test = np.array(joblib.load('FeatureExtraction/UPDATED_test_fts.joblib')), np.array(joblib.load('FeatureExtraction/UPDATED_test_ys.joblib'))
+X_train, y_train = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_train_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_train_ys.joblib'))
+X_val, y_val = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_val_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_val_ys.joblib'))
+X_test, y_test = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_test_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/UPDATED_test_ys.joblib'))
 
 print(X_train.shape, y_train.shape, X_val.shape, y_val.shape)
     
@@ -27,9 +27,9 @@ train_loader = DataLoader(dg,batch_size = 1,shuffle = True)
 val_loader = DataLoader(val_dg,batch_size = 1,shuffle = False)
 test_loader = DataLoader(test_dg,batch_size = 1,shuffle = False)
 
-# D:1024, LR:1e-5, WD:1e-6, NPB:4
+# D:1024, LR:1e-5, WD:1e-6, NPB:24
 cD = 1024
-cLR = 1e-5
+cLR = 1e-4
 cWD = 1e-6
 cNPB = 4
 random.seed(0)
@@ -136,7 +136,7 @@ for epoch in range(100):
     test_losses.append(sum(losses)/len(losses))
     test_aurocs.append(roc_auc_score(bag_ys, bag_preds))
 
-    torch.save(model.state_dict(), '../modelsbest_dtfd_pe_mimiccxr_densenet_epoch%d'%(epoch))
+    torch.save(model.state_dict(), '/data2/meerak/models/best_dtfd_pe_mimiccxr_densenet_epoch%d'%(epoch))
 
     if val_aurocs[-1] < max_acc:
         stop_idx += 1

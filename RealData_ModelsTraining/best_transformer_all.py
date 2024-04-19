@@ -14,9 +14,9 @@ os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="5"
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-X_train, y_train = np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_train_fts.joblib')), np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_train_ys.joblib'))
-X_val, y_val = np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_val_fts.joblib')), np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_val_ys.joblib'))
-X_test, y_test = np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_test_fts.joblib')), np.array(joblib.load('../extract_features_pretrain_sup/UPDATED_test_ys.joblib'))
+X_train, y_train = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/extract_features_pretrain_sup/UPDATED_train_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/extract_features_pretrain_sup/UPDATED_train_ys.joblib'))
+X_val, y_val = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/extract_features_pretrain_sup/UPDATED_val_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/extract_features_pretrain_sup/UPDATED_val_ys.joblib'))
+X_test, y_test = np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/extract_features_pretrain_sup/UPDATED_test_fts.joblib')), np.array(joblib.load('/data2/meerak/MIMIC_CXR_FTS/extract_features_pretrain_sup/UPDATED_test_ys.joblib'))
 
 print(X_train.shape, y_train.shape, X_val.shape, y_val.shape)
     
@@ -38,8 +38,8 @@ cD = 128
 cLR = 1e-5
 cWD = 1e-7
 
-for dict_attn in ['_orig']:
-        for dict_agg in [ '']:
+for dict_attn in ['', '_orig']:
+        for dict_agg in ['_max', '_avg', '']:
             for dict_addPE in ['', '_pe']:
                 
                 if dict_agg == '_max':
