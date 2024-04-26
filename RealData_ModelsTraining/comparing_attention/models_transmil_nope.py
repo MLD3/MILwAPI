@@ -13,6 +13,7 @@ from token_performer import Token_performer
 from transformer_block import Block, get_sinusoid_encoding
 from clam_models import *
     
+
 class PPEG(nn.Module):
     def __init__(self, dim=512):
         super(PPEG, self).__init__()
@@ -31,17 +32,36 @@ class PPEG(nn.Module):
 
 
 class TransLayer(nn.Module):
-    def __init__(self, norm_layer=nn.LayerNorm, dim=512, add = True):
+    def __init__(self, attn, norm_layer=nn.LayerNorm, dim=512, add = True):
         super(TransLayer, self).__init__()
         self.norm = norm_layer(dim)
-        self.attn = nn.MultiheadAttention(dim, 8, batch_first = True)
+        self.attntype = attn
+        self.add = add
+        if attn == 'Nystrom':
+            self.attn = NystromAttention(
+                dim = dim,
+                dim_head = dim//8,
+                heads = 8,
+                num_landmarks = dim//2,    # number of landmarks
+                pinv_iterations = 6,    # number of moore-penrose iterations for approximating pinverse. 6 was recommended by the paper
+                residual = True,         # whether to do an extra residual with the value or not. supposedly faster convergence if turned on
+                dropout=0.1,
+            )
+        elif attn == 'Orig':
+            self.attn = nn.MultiheadAttention(dim, 8, batch_first = True)
 
     def forward(self, x):
-        y, attn = self.attn(self.norm(x), self.norm(x), self.norm(x))
-        x = x + y
+        if self.attntype == 'Nystrom':
+            y, attn = self.attn(self.norm(x), return_attn = True)
+        else:
+            y, attn = self.attn(self.norm(x), self.norm(x), self.norm(x))
+        if self.add == True:
+            x = x + y
+        else: 
+            x = y
+            
         return x, attn
-
-
+    
 class TransMIL_End(nn.Module):
     def __init__(self, n_classes, dim, outerdim):
         super(TransMIL_End, self).__init__()
@@ -49,8 +69,8 @@ class TransMIL_End(nn.Module):
         self._fc1 = nn.Sequential(nn.Linear(outerdim, dim), nn.ReLU())
         self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
         self.n_classes = n_classes
-        self.layer1 = TransLayer(dim = dim)
-        self.layer2 = TransLayer(dim = dim)
+        self.layer1 = TransLayer(attn = 'Nystrom', dim = dim)
+        self.layer2 = TransLayer(attn = 'Nystrom', dim = dim)
         self.norm = nn.LayerNorm(dim)
         self._fc2 = nn.Linear(dim, self.n_classes)
 
@@ -74,10 +94,7 @@ class TransMIL_End(nn.Module):
 
         #---->Translayer x1
         h, first_attns = self.layer1(h) #[B, N, 512]
-
-        # #---->PPEG
-        h = self.pos_layer(h, _H, _W) #[B, N, 512]
-
+        
         #---->Translayer x2
         h, second_attns = self.layer2(h) #[B, N, 512]
 
@@ -89,14 +106,14 @@ class TransMIL_End(nn.Module):
         Y_hat = torch.argmax(logits, dim=1)
         Y_prob = F.softmax(logits, dim = 1)
         return logits
-    
-    
 
-class TransMIL_Orig(nn.Module):
+
+class TransMIL(nn.Module):
     def __init__(self, cD):
-        super(TransMIL_Orig, self).__init__()        
-        self.L = 1000
+        super(TransMIL, self).__init__()
         
+        self.L = 1000
+
         self.D = cD
         self.K = 1
 
@@ -105,8 +122,10 @@ class TransMIL_Orig(nn.Module):
 
 
     def forward(self, H):
+
         Y_prob = self.transmil_classifier(data = H.unsqueeze(0))
 
         return Y_prob
-
+    
+    
     
